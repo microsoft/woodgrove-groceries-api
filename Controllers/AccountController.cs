@@ -25,52 +25,48 @@ public class AccountController : ControllerBase
     public async Task<AccountData> GetAsync()
     {
         string accessToken = string.Empty;
-        // Acquire the access token.
+
+        // Get the app settings
         string baseUrl = _configuration.GetSection("WoodgroveGroceriesDownstreamApi:BaseUrl").Value!;
         string[] scopes = _configuration.GetSection("WoodgroveGroceriesDownstreamApi:Scopes").Get<string[]>();
-        var x = User.Claims;
+
+        // Check the scopes application settings
         if (scopes == null)
         {
-            throw new Exception("The MyApi:Scopes application setting is misconfigured or missing. Use the array format: [\"Account.Payment\", \"Account.Purchases\"]");
+            return new AccountData("The MyApi:Scopes application setting is misconfigured or missing. Use the array format: [\"Account.Payment\", \"Account.Purchases\"]");
         }
-        else if (baseUrl == null)
+
+        // Check the base URL application settings
+        if (baseUrl == null)
         {
-            throw new Exception("The MyApi:BaseUrl application setting is misconfigured or missing. Check out your applications' scope base URL in Microsoft Entra admin center. For example: api://12345678-0000-0000-0000-000000000000");
+            return new AccountData("The MyApi:BaseUrl application setting is misconfigured or missing. Check out your applications' scope base URL in Microsoft Entra admin center. For example: api://12345678-0000-0000-0000-000000000000");
         }
-        else
+
+        // Set the scope full URL (temporary workaround should be fix)
+        for (int i = 0; i < scopes.Length; i++)
         {
-            for (int i = 0; i < scopes.Length; i++)
-            {
-                scopes[i] = $"{baseUrl}/{scopes[i]}";
-            }
+            scopes[i] = $"{baseUrl}/{scopes[i]}";
+        }
 
-            try
-            {
-                accessToken = await _authorizationHeaderProvider.CreateAuthorizationHeaderForUserAsync(scopes);
-            }
-            catch (System.Exception ex)
-            {
-                if (ex.GetType().ToString().Contains("MicrosoftIdentityWebChallengeUserException"))
-                {
-                    throw new Exception("The token cache does not contain the token to access the web APIs. To get the access token, sign-out and sign-in again.");
-                }
-                else
-                {
-                    throw ex;
-                }
-
-            }
+        try
+        {
+            // Acquire an access token to call the downstream API (Payment API).
+            accessToken = await _authorizationHeaderProvider.CreateAuthorizationHeaderForUserAsync(scopes);
+        }
+        catch (System.Exception ex)
+        {
+            return new AccountData(ex.Message);
         }
 
         AccountData account = new AccountData();
         account.DisplayName = User.Identity.Name;
 
-        //
+        // Simulates a call to a downstream API and return the access token for the downstream API
         account.Payment = new Payment();
         account.Payment.AccessTokenToCallThePaymentAPI = accessToken;
         account.Payment.NameOnCard = User.Identity.Name;
         account.Payment.CardNumber = "123456789000000";
-        account.Payment.ExpirationDate  = DateTime.Now.AddDays(500).ToShortDateString();
+        account.Payment.ExpirationDate = DateTime.Now.AddDays(500).ToShortDateString();
         return account;
     }
 }
