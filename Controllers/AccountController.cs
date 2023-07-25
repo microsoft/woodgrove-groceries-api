@@ -33,13 +33,13 @@ public class AccountController : ControllerBase
         // Check the scopes application settings
         if (scopes == null)
         {
-            return new AccountData("The MyApi:Scopes application setting is misconfigured or missing. Use the array format: [\"Account.Payment\", \"Account.Purchases\"]");
+            return new AccountData("The WoodgroveGroceriesDownstreamApi:Scopes application setting is misconfigured or missing. Use the array format: [\"Account.Payment\", \"Account.Purchases\"]");
         }
 
         // Check the base URL application settings
         if (baseUrl == null)
         {
-            return new AccountData("The MyApi:BaseUrl application setting is misconfigured or missing. Check out your applications' scope base URL in Microsoft Entra admin center. For example: api://12345678-0000-0000-0000-000000000000");
+            return new AccountData("The WoodgroveGroceriesDownstreamApi:BaseUrl application setting is misconfigured or missing. Check out your applications' scope base URL in Microsoft Entra admin center. For example: api://12345678-0000-0000-0000-000000000000");
         }
 
         // Set the scope full URL (temporary workaround should be fix)
