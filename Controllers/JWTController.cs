@@ -36,9 +36,14 @@ public class JWTController : ControllerBase
             SecurityToken securityToken = handler.ReadToken(requestPayload.token);
             System.IdentityModel.Tokens.Jwt.JwtSecurityToken jwt = ((System.IdentityModel.Tokens.Jwt.JwtSecurityToken)securityToken);
 
+            string[] ignoreClaims = { "exp", "aio", "azpacr", "rh", "uti", "azp", "iat", "sub", "nbf", "acct", "acr", "ipaddr", "platf", "puid", "appid", "tenant_region_scope", "tid", "wids", "xms_st", "xms_tcdt" };
             foreach (var item in jwt.Claims)
             {
-                claims.Add(item.Type, item.Value);
+                if (requestPayload.showSystemClaims == true)
+                    claims.Add(item.Type, item.Value);
+                else
+                    if (!ignoreClaims.Any(item.Type.Contains))
+                    claims.Add(item.Type, item.Value);
             }
 
         }
@@ -47,12 +52,13 @@ public class JWTController : ControllerBase
             claims.Add("error", ex.Message);
         }
 
-        return claims.OrderBy(obj => obj.Key).ToDictionary(obj => obj.Key, obj => obj.Value);;
+        return claims.OrderBy(obj => obj.Key).ToDictionary(obj => obj.Key, obj => obj.Value); ;
     }
 }
 
 public class jwtPayload
 {
     public string token { get; set; }
+    public bool? showSystemClaims { get; set; } = false;
 }
 
