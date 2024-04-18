@@ -46,7 +46,7 @@ public class JWTController : ControllerBase
         }
         catch (System.Exception ex)
         {
-
+            claims.Add("error", ex.Message);
         }
 
         return claims;
