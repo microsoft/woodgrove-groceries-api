@@ -24,18 +24,16 @@ public class JWTController : ControllerBase
         _authorizationHeaderProvider = authorizationHeaderProvider;
     }
 
-    [HttpGet(Name = "JWT")]
-    public async Task<Dictionary<string, string>> GetAsync()
+    [HttpPost(Name = "JWT")]
+    public async Task<Dictionary<string, string>> PostAsync([FromBody] jwtPayload requestPayload)
     {
         Dictionary<string, string> claims = new Dictionary<string, string>();
 
         try
         {
-            string accessToken = Request.Query["token"];
-
             var handler = new JwtSecurityTokenHandler();
 
-            SecurityToken securityToken = handler.ReadToken(accessToken);
+            SecurityToken securityToken = handler.ReadToken(requestPayload.token);
             System.IdentityModel.Tokens.Jwt.JwtSecurityToken jwt = ((System.IdentityModel.Tokens.Jwt.JwtSecurityToken)securityToken);
 
             foreach (var item in jwt.Claims)
@@ -53,5 +51,8 @@ public class JWTController : ControllerBase
     }
 }
 
-
+public class jwtPayload
+{
+    public string token { get; set; }
+}
 
