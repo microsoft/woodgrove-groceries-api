@@ -47,7 +47,7 @@ public class JWTController : ControllerBase
             claims.Add("error", ex.Message);
         }
 
-        return claims;
+        return claims.OrderBy(obj => obj.Key).ToDictionary(obj => obj.Key, obj => obj.Value);;
     }
 }
 
