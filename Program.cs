@@ -29,11 +29,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddInMemoryTokenCaches();
 
 builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme,
-                                                 options => 
-                                                 {  
+                                                 options =>
+                                                 {
                                                      options.TokenValidationParameters.NameClaimType = "name";
-                                                 }); 
+                                                 });
+// Add in memory cache                                                  
+builder.Services.AddMemoryCache();
+
+// Add API controllers
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
